@@ -41,10 +41,11 @@ namespace LinqWithLambda
             var r1 = products.Where(x => x.Price < 900.00 && x.Category.Tier == 1); //retorna os produtos com valor < 900 e que são do grupo Tier = 1
             Print("TIER 1 AND PRICE < 900: ", r1);
 
-            var r2 = products.Where(x => x.Category.Name == "Tools").Select(p => p.Name); //exibe apenas o nome, para os produtos da categoria 'Tools'
+            var r2 = products.Where(x => x.Category.Name == "Tools").Select(p => p.Name); //exibe apenas o nome, para os produtos da categoria 'Tools'            
             Print("NAMES OF PRODUCTS FROM TOOLS: ", r2);
 
             var r3 = products.Where(x => x.Name[0] == 'C').Select(x => new { x.Name, x.Price, CategoryName = x.Category.Name }); //seleciona os produtos q iniciam com 'C',
+            
             Print("NAMES STARTED WITH 'C' AND ANONYMOUS OBJECT: ", r3);                                                         // e cria um obj anonimo exibindo determinados campos
 
             var r4 = products.Where(x => x.Category.Tier == 1).OrderBy(x => x.Price).ThenBy(x => x.Name); //ordena pelo preço, e em seguida pelo nome
@@ -87,6 +88,55 @@ namespace LinqWithLambda
             var r16 = products.GroupBy(p => p.Category);
             Console.WriteLine();
             foreach (IGrouping<Category, Product> group in r16)
+            {
+                Console.WriteLine("Category " + group.Key.Name + ":");
+                foreach (Product p in group)
+                {
+                    Console.WriteLine(p);
+                }
+                Console.WriteLine();
+            }
+
+            Console.WriteLine("-----------------------------");
+            Console.WriteLine("Usando uma sintaxe alternativa semelhante ao SQL");
+
+            var r17 =
+                from p in products
+                where p.Category.Tier == 1 && p.Price < 900.0
+                select p;
+            Print("TIER 1 AND PRICE < 900: ", r17);
+                        
+            var r18 =
+                from p in products
+                where p.Category.Name == "Tools"
+                select p.Name;
+
+            Print("NAMES OF PRODUCTS FROM TOOLS: ", r18);
+
+            var r19 =
+                from p in products
+                where p.Name[0] == 'C'
+                select new { p.Name, p.Price, CategoryName = p.Category.Name };
+            Print("NAMES STARTED WITH 'C' AND ANONYMOUS OBJECT: ", r19);
+
+            var r20 =
+                from p in products
+                where p.Category.Tier == 1
+                orderby p.Name
+                orderby p.Price
+                select p;
+            Print("TIER 1 ORDER BY PRICE THEN NAME", r20);
+
+            var r21 =
+                (from p in r4
+                 select p).Skip(2).Take(4);
+            Print("TIER 1 ORDER BY PRICE THEN BY NAME SKIP 2 TAKE 4 ", r21);
+
+            var r22 =
+                from p in products
+                group p by p.Category;
+            Console.WriteLine();
+            foreach (IGrouping<Category, Product> group in r22)
             {
                 Console.WriteLine("Category " + group.Key.Name + ":");
                 foreach (Product p in group)
